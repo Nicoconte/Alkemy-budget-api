@@ -7,6 +7,8 @@ from rest_framework import status
 
 from rest_framework.authtoken.models import Token
 
+from api.balance.models import Balance
+
 import json
 
 class UserView(APIView):
@@ -18,6 +20,7 @@ class UserView(APIView):
             user = User.objects.create_user(username=body['username'], email=body['email'], password=body['password'])
 
             if user:
+                Balance.objects.create(user=user)
                 token = Token.objects.create(user=user)
 
                 return Response({
