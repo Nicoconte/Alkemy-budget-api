@@ -11,11 +11,12 @@ from api.balance.models import Balance
 
 import json
 
-class UserView(APIView):
+class UserRegister(APIView):
     #Register
     def post(self, request):
         try:
             body = json.loads(request.body)
+            print(body)
 
             user = User.objects.create_user(username=body['username'], email=body['email'], password=body['password'])
 
@@ -24,6 +25,7 @@ class UserView(APIView):
                 token = Token.objects.create(user=user)
 
                 return Response({
+                    "username" : user.username,
                     "key" : token.key
                 }, status=status.HTTP_200_OK)
             
@@ -35,10 +37,12 @@ class UserView(APIView):
                 "details" : str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
 
-    #Login
-    def get(self, request):
+
+class UserAuth(APIView):
+    def post(self, request):
         try:
             body = json.loads(request.body)
+            print(body)
 
             user = authenticate(request, username=body['username'], password=body['password'])
 
@@ -46,13 +50,17 @@ class UserView(APIView):
                 token = Token.objects.get(user=user)
 
                 return Response({   
+                    "username" : user.username,
                     "key" : token.key
                 }, status=status.HTTP_200_OK)
             
             else:
-                raise Exception
+                return Response({
+                    "details" : "Invalid credentials"
+                }, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
             return Response({
                 "details" : str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+

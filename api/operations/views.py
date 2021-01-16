@@ -9,8 +9,9 @@ from rest_framework.authentication import TokenAuthentication
 from .models import Operation
 from .serializers import OperationSerializer
 
-from api.users.utils import get_balance_from_user, get_user_from_token
+
 from api.balance.utils import update_balance_money, update_balance_after_delete, get_balance_money
+from api.users.utils import get_balance_from_user, get_user_from_token
 
 from datetime import datetime
 
@@ -123,7 +124,7 @@ class ListOperations(APIView):
             user = get_user_from_token(request)
             op = Operation.objects.filter(user=user)
 
-            if op:
+            if op and len(op) > 0:
                 serializer = OperationSerializer(op, many=True)
 
                 return Response(serializer.data)
@@ -132,3 +133,26 @@ class ListOperations(APIView):
             return Response({
                 "details" : str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+
+class ListLatestOperations(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            user = get_user_from_token(request)
+            op = Operation.objects.filter(user=user).order_by('-pk')
+            serializer = None
+
+            if len(op) >= 10:
+                serializer = OperationSerializer(op[0:10], many=True)
+
+            else:                
+                serializer = OperationSerializer(op, many=True)
+            
+            return Response(serializer.data)
+
+        except Exception as e:
+            return Response({
+                "details" : str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)    

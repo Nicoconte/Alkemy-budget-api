@@ -10,9 +10,6 @@ from .models import Balance
 
 from api.users.utils import get_user_from_token
 
-
-import json
-
 # Create your views here.
 
 class BalanceView(APIView):
@@ -27,8 +24,8 @@ class BalanceView(APIView):
             if balance:
                 serializer = BalanceSerializer(balance)
 
-                return Response(serializer.data, safe=False)
-            
+                return Response(serializer.data)
+
         except Exception as e:
             return Response({
                 "details" : str(e)

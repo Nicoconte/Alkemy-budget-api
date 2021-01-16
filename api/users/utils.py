@@ -3,7 +3,9 @@ from rest_framework.authtoken.models import Token
 from api.balance.models import Balance
 
 def get_user_from_token(request):
+    token_key = ""
     token_key = request.META.get("HTTP_AUTHORIZATION").replace("Token ", "")
+    print(f"Token entrante => {token_key}")
     token = Token.objects.get(key=token_key)
     return token.user
 

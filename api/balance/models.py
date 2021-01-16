@@ -7,4 +7,4 @@ class Balance(models.Model):
     total_money = models.FloatField(default=0.0) 
 
     def __str__(self):
-        return f"Usuario: {self.user.username} | Dinero: {self.total_money}"
+        return f"Usuario: {self.user.username} | Dinero total: {self.total_money}"
